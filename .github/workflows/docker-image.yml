@@ -34,6 +34,7 @@ jobs:
 
       - name: Push Docker Image
         run: |
+          docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
           docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
 
       - name: Deploy to Cloud Server
