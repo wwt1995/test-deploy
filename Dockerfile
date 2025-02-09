@@ -8,7 +8,8 @@ WORKDIR /app
 RUN npm install -g yarn
 
 # 复制package.json和yarn.lock
-COPY package.json yarn.lock ./
+# COPY package.json yarn.lock ./
+COPY package.json ./
 
 # 安装依赖
 RUN yarn install
