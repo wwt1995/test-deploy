@@ -22,7 +22,7 @@ jobs:
 
       - name: Login to Alibaba Cloud Registry
         run: |
-          docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
+          docker login --username=$DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY
 
       - name: Build Docker Image
         run: |
@@ -43,7 +43,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
+            docker login --username=$DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY
             docker pull $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
             docker stop vue-app || true
             docker rm vue-app || true
