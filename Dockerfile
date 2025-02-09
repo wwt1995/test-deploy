@@ -18,7 +18,7 @@ RUN npm install
 COPY . .
 
 # 构建项目
-RUN npm build
+RUN npm run build
 
 # 使用Nginx官方镜像作为基础镜像
 FROM nginx:alpine
