@@ -5,7 +5,7 @@ on:
     branches: [main]  # 触发分支
 
 env:
-  DOCKER_IMAGE_NAME: vue-app  # 镜像名称（如：vue-app）
+  DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}  # 镜像名称（如：vue-app）
   DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}  # 镜像仓库（可选：阿里云ACR、腾讯云TCR等）
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # 仓库用户名（GitHub Secrets）
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # 仓库密码（GitHub Secrets）
@@ -20,17 +20,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Login to Docker Registry
+      - name: Login to Alibaba Cloud Registry
         run: |
-          echo "$DOCKER_PASSWORD" | docker login $DOCKER_REGISTRY -u $DOCKER_USERNAME --password-stdin
+          docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
 
       - name: Build Docker Image
         run: |
-          docker build -t $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest .
+          docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest .
+
+      - name: Tag Docker Image
+        run: |
+          docker tag $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
 
       - name: Push Docker Image
         run: |
-          docker push $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
+          docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
 
       - name: Deploy to Cloud Server
         uses: appleboy/ssh-action@v0.1.10
@@ -39,7 +43,8 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
+            docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
+            docker pull $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
             docker stop vue-app || true
             docker rm vue-app || true
-            docker run -d --name vue-app -p 80:80 $DOCKER_REGISTRY/$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:latest
+            docker run -d --name vue-app -p 80:80 $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
