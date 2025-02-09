@@ -10,7 +10,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # 仓库用户名（GitHub Secrets）
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  # 仓库密码（GitHub Secrets）
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # 云服务器SSH私钥（GitHub Secrets）
-  SERVER_IP: ${{ secrets.SERVER_IP }}        # 云服务器IP（GitHub Secrets）
+  ECS_SERVER_IP: ${{ secrets.ECS_SERVER_IP }}      # 云服务器IP（GitHub Secrets）
 
 jobs:
   build-and-deploy:
@@ -34,15 +34,14 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
           docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
 
       - name: Deploy to Cloud Server
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.SERVER_IP }}
+          host: ${{ secrets.ECS_SERVER_IP }}
           username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.ECS_SERVER_PASSWORD }}
           script: |
             docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
             docker pull $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
