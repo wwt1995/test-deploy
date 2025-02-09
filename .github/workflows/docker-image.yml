@@ -43,8 +43,8 @@ jobs:
           username: root
           password: ${{ secrets.ECS_SERVER_PASSWORD }}
           script: |
-            docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
-            docker pull $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
-            docker stop vue-app || true
-            docker rm vue-app || true
-            docker run -d --name vue-app -p 80:80 $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
+            docker login --username=${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_REGISTRY }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+            if [ $(docker ps -q -f name=vue-app) ]; then docker stop vue-app; fi
+            if [ $(docker ps -a -q -f name=vue-app) ]; then docker rm vue-app; fi
+            docker run -d --name vue-app -p 80:80 ${{ secrets.DOCKER_REGISTRY }}/$DOCKER_IMAGE_NAME:latest
