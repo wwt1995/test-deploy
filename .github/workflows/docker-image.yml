@@ -22,16 +22,16 @@ jobs:
 
       - name: Login to Alibaba Cloud Registry
         run: |
-          echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY
+          docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
 
       - name: Build Docker Image
         run: |
           docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest .
 
-          - name: Tag Docker Image
-          run: |
+      - name: Tag Docker Image
+        run: |
           docker tag $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
-     
+
       - name: Push Docker Image
         run: |
           docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
@@ -43,7 +43,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY
+            docker login --username=$DOCKER_USERNAME $DOCKER_REGISTRY -p $DOCKER_PASSWORD
             docker pull $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
             docker stop vue-app || true
             docker rm vue-app || true
