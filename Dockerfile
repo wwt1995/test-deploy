@@ -24,7 +24,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # 复制构建输出到Nginx的html目录
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # 复制自定义的Nginx配置文件
 COPY nginx.conf /etc/nginx/nginx.conf
