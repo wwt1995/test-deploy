@@ -5,20 +5,20 @@ FROM node:20 AS build
 WORKDIR /app
 
 # 安装Yarn
-RUN npm install -g yarn
+# RUN npm install -g yarn
 
 # 复制package.json和yarn.lock
 # COPY package.json yarn.lock ./
 COPY package.json ./
 
 # 安装依赖
-RUN yarn install
+RUN npm install
 
 # 复制项目文件
 COPY . .
 
 # 构建项目
-RUN yarn build
+RUN npm build
 
 # 使用Nginx官方镜像作为基础镜像
 FROM nginx:alpine
